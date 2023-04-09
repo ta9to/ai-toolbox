@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react';
 import { Configuration, OpenAIApi } from 'openai';
-
 class CustomFormData extends FormData {
     getHeaders() {
         return {}

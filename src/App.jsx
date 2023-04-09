@@ -3,6 +3,7 @@ import { Tab } from '@headlessui/react'
 import { BuildingOfficeIcon, CreditCardIcon, UserIcon, UsersIcon } from '@heroicons/react/20/solid'
 import Settings from "./Settings.jsx";
 import Images from "./Images";
+import Audio from "./Audio";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -76,7 +77,7 @@ export default function App() {
                                     <Images />
                                 </Tab.Panel>
                                 <Tab.Panel className="pt-10">
-                                    hogefuga
+                                    <Audio />
                                 </Tab.Panel>
                                 <Tab.Panel className="pt-10">
                                     <Settings />
