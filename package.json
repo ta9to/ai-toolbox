@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp manifest.json dist/manifest.json && cp src/assets/images/icon128.png dist/icon128.png",
+    "build": "vite build && cp manifest.json dist/manifest.json && cp src/assets/images/icon128.png dist/icon128.png && cd dist && zip -r ../ai-toolbox-extension.zip .",
     "preview": "vite preview"
   },
   "dependencies": {
