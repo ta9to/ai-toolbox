@@ -92,7 +92,7 @@ export default function Audio() {
                 {isLoading && (
                     <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500 mx-auto mt-4"></div>
                 )}
-                <div className="col-span-full">
+                <div className="col-span-full pb-12">
                     <label htmlFor="result" className="block text-sm font-medium leading-6 text-gray-900">
                         Result
                     </label>
@@ -101,7 +101,7 @@ export default function Audio() {
                     id="result"
                     name="result"
                     rows={10}
-                    className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
+                    className="!outline-none block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 px-3 sm:text-sm sm:leading-6"
                     value={transcription}
                     readOnly
                 />

@@ -4,6 +4,7 @@ import { BuildingOfficeIcon, CreditCardIcon, UserIcon, UsersIcon } from '@heroic
 import Settings from "./Settings.jsx";
 import Images from "./Images";
 import Audio from "./Audio";
+import Chat from "./Chat";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -19,18 +20,18 @@ export default function App() {
                         <Tab.Group as="div">
                             <div className="border-b border-gray-200">
                                 <Tab.List className="-mb-px flex space-x-8">
-                                    <Tab
-                                        className={({ selected }) =>
-                                            classNames(
-                                                selected
-                                                    ? 'border-indigo-600 text-indigo-600'
-                                                    : 'border-transparent text-gray-700 hover:border-gray-300 hover:text-gray-800',
-                                                'whitespace-nowrap border-b-2 py-6 text-sm font-medium'
-                                            )
-                                        }
-                                    >
-                                        Chat
-                                    </Tab>
+                                    {/*<Tab*/}
+                                    {/*    className={({ selected }) =>*/}
+                                    {/*        classNames(*/}
+                                    {/*            selected*/}
+                                    {/*                ? 'border-indigo-600 text-indigo-600'*/}
+                                    {/*                : 'border-transparent text-gray-700 hover:border-gray-300 hover:text-gray-800',*/}
+                                    {/*            'whitespace-nowrap border-b-2 py-6 text-sm font-medium'*/}
+                                    {/*        )*/}
+                                    {/*    }*/}
+                                    {/*>*/}
+                                    {/*    Chat*/}
+                                    {/*</Tab>*/}
                                     <Tab
                                         className={({ selected }) =>
                                             classNames(
@@ -70,18 +71,10 @@ export default function App() {
                                 </Tab.List>
                             </div>
                             <Tab.Panels as={Fragment}>
-                                <Tab.Panel className="pt-10">
-                                    hoge
-                                </Tab.Panel>
-                                <Tab.Panel className="pt-10">
-                                    <Images />
-                                </Tab.Panel>
-                                <Tab.Panel className="pt-10">
-                                    <Audio />
-                                </Tab.Panel>
-                                <Tab.Panel className="pt-10">
-                                    <Settings />
-                                </Tab.Panel>
+                                {/*<Tab.Panel className="pt-10"><Chat /></Tab.Panel>*/}
+                                <Tab.Panel className="pt-10"><Images /></Tab.Panel>
+                                <Tab.Panel className="pt-10"><Audio /></Tab.Panel>
+                                <Tab.Panel className="pt-10"><Settings /></Tab.Panel>
                             </Tab.Panels>
                         </Tab.Group>
                     </div>
