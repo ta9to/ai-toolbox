@@ -15,10 +15,19 @@ export default function Audio() {
                     setApiKey(data.openai_api_key)
                 }
             });
+            chrome.storage.local.get('translated_text', (data) => {
+                if (data.translated_text) {
+                    setTranscription(data.translated_text)
+                }
+            });
         } else {
             const storedApiKey = localStorage.getItem('openai_api_key');
             if (storedApiKey) {
                 setApiKey(storedApiKey)
+            }
+            const translatedText = localStorage.getItem('translated_text');
+            if (translatedText) {
+                setTranscription(translatedText)
             }
         }
     }, []);
@@ -45,6 +54,11 @@ export default function Audio() {
         setIsLoading(true);
         try {
             const response = await openai.createTranscription(file, 'whisper-1', prompt);
+            if (chrome.storage) {
+                chrome.storage.local.set({ translated_text: response.data.text });
+            } else {
+                localStorage.setItem('translated_text', response.data.text);
+            }
             setTranscription(response.data.text);
         } catch (error) {
             console.error('エラーが発生しました: ', error);
