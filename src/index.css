@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .fade-out {
+        @apply transition-opacity duration-300 ease-out;
+    }
+    .fade-out-enter {
+        @apply opacity-0;
+    }
+    .fade-out-enter-active {
+        @apply opacity-100;
+    }
+    .fade-out-exit {
+        @apply opacity-100;
+    }
+    .fade-out-exit-active {
+        @apply opacity-0;
+    }
+}
