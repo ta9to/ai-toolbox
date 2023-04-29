@@ -38,7 +38,7 @@ export default function App() {
                                                 selected
                                                     ? 'border-indigo-600 text-indigo-600'
                                                     : 'border-transparent text-gray-700 hover:border-gray-300 hover:text-gray-800',
-                                                'whitespace-nowrap border-b-2 py-6 text-sm font-medium'
+                                                '!outline-none whitespace-nowrap border-b-2 py-6 text-sm font-medium'
                                             )
                                         }
                                     >
@@ -50,7 +50,7 @@ export default function App() {
                                                 selected
                                                     ? 'border-indigo-600 text-indigo-600'
                                                     : 'border-transparent text-gray-700 hover:border-gray-300 hover:text-gray-800',
-                                                'whitespace-nowrap border-b-2 py-6 text-sm font-medium'
+                                                '!outline-none whitespace-nowrap border-b-2 py-6 text-sm font-medium'
                                             )
                                         }
                                     >
@@ -62,7 +62,7 @@ export default function App() {
                                                 selected
                                                     ? 'border-indigo-600 text-indigo-600'
                                                     : 'border-transparent text-gray-700 hover:border-gray-300 hover:text-gray-800',
-                                                'whitespace-nowrap border-b-2 py-6 text-sm font-medium'
+                                                '!outline-none whitespace-nowrap border-b-2 py-6 text-sm font-medium'
                                             )
                                         }
                                     >
