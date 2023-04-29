@@ -9,8 +9,12 @@ import { CheckCircleIcon, XMarkIcon } from '@heroicons/react/20/solid'
 
 export default function Chat() {
     const [apiKey, setApiKey] = useStorage("openai_api_key");
-    const [messages, setMessages] = useState([]);
-    // const [messages, setMessages] = useStorage("chat_messages", true, [])
+    const [messages, setMessages] = useStorage("chat_messages", true, [])
+    useEffect(() => {
+        if (messages.length > 0) {
+            saveToStorage("chat_messages", messages, true);
+        }
+    }, [messages]);
     const [inputMessage, setInputMessage] = useState("");
     const [currentResponse, setCurrentResponse] = useState("");
     const [chatPrompt, setChatPrompt] = useStorage("chat_prompt", false, '');
@@ -111,7 +115,7 @@ export default function Chat() {
                     </div>
                 </div>
             )}
-            <div className="flex flex-col h-490">
+            <div className="flex flex-col h-470">
                 <div className="flex-grow space-y-4 overflow-auto">
                     {messages.map((message, index) => (
                         <div
