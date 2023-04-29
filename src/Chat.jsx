@@ -10,9 +10,10 @@ import { CheckCircleIcon, XMarkIcon } from '@heroicons/react/20/solid'
 export default function Chat() {
     const [apiKey, setApiKey] = useStorage("openai_api_key");
     const [messages, setMessages] = useState([]);
+    // const [messages, setMessages] = useStorage("chat_messages", true, [])
     const [inputMessage, setInputMessage] = useState("");
     const [currentResponse, setCurrentResponse] = useState("");
-    const [chatPrompt, setChatPrompt] = useStorage("chat_prompt");
+    const [chatPrompt, setChatPrompt] = useStorage("chat_prompt", false, '');
     const [alertVisible, setAlertVisible] = useState(false);
     const messagesEndRef = useRef(null);
 
@@ -72,7 +73,6 @@ export default function Chat() {
             const systemMessage = { role: "system", content: chatPrompt };
             const userMessage = { role: "user", content: inputMessage };
             setMessages((prevMessages) => [...prevMessages, userMessage]);
-
             // Make the call and store a reference to the XMLHttpRequest
             const xhr = OpenAIExt.streamClientChatCompletion(
                 {
