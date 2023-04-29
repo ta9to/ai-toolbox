@@ -5,6 +5,11 @@ class CustomFormData extends FormData {
         return {}
     }
 }
+function getSigValue(url) {
+    const parsedUrl = new URL(url);
+    const queryParams = new URLSearchParams(parsedUrl.search);
+    return queryParams.get('sig');
+}
 
 export default function Images() {
     const [apiKey, setApiKey] = useState('');
@@ -27,6 +32,18 @@ export default function Images() {
     const [isLoading, setIsLoading] = useState(false);
     const handlePromptChange = (e) => {
         setPrompt(e.target.value);
+    };
+    const downloadImage = (imageUrl) => {
+        const sig = getSigValue(imageUrl)
+        const filename = `image-${sig}.png`;
+        if (chrome.downloads) {
+            chrome.downloads.download({
+                url: imageUrl,
+                filename: filename,
+            });
+        } else {
+            console.log(filename);
+        }
     };
     const exec = async (event) => {
         event.preventDefault();
@@ -55,7 +72,7 @@ export default function Images() {
         }
     };
     return (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="pb-12 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl">
                 <form>
                     <div className="space-y-12">
@@ -99,13 +116,14 @@ export default function Images() {
                 {isLoading && (
                     <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500 mx-auto mt-4"></div>
                 )}
-                <div className="col-span-full mt-1">
+                <div className="col-span-full mt-2">
                     <ul role="list" className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
                         {images.map((url, index) => (
                             <li key={index} className="relative">
                                 <div className="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                                     <img src={url} alt="" className="pointer-events-none object-cover group-hover:opacity-75" />
                                 </div>
+                                <button onClick={() => downloadImage(url, index)} type="button" className="mt-1 w-full rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Download</button>
                             </li>
                         ))}
                     </ul>

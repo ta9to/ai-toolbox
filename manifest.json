@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AI-ToolBox",
   "description": "さまざまなOpenAI APIツールを1つにまとめた、便利な拡張機能です。",
-  "version": "1.0",
+  "version": "1.0.1",
   "icons": {
     "16" : "icon128.png",
     "32": "icon128.png",
@@ -13,6 +13,7 @@
     "default_popup": "index.html"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "downloads"
   ]
 }
