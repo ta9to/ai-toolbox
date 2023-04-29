@@ -20,16 +20,26 @@ export default function Images() {
                     setApiKey(data.openai_api_key)
                 }
             });
+            chrome.storage.local.get('image_urls', (data) => {
+                if (data.image_urls) {
+                    setImages(JSON.parse(data.image_urls))
+                }
+            });
         } else {
             const storedApiKey = localStorage.getItem('openai_api_key');
             if (storedApiKey) {
                 setApiKey(storedApiKey)
+            }
+            const imageUrls = localStorage.getItem('image_urls');
+            if (imageUrls) {
+                setImages(JSON.parse(imageUrls))
             }
         }
     }, []);
     const [prompt, setPrompt] = useState('');
     const [images, setImages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+
     const handlePromptChange = (e) => {
         setPrompt(e.target.value);
     };
@@ -64,6 +74,11 @@ export default function Images() {
         try {
             const response = await openai.createImage(createImageRequest);
             const imageUrls = response.data.data.map((imageData) => imageData.url);
+            if (chrome.storage) {
+                chrome.storage.local.set({ image_urls: JSON.stringify(imageUrls) });
+            } else {
+                localStorage.setItem('image_urls', JSON.stringify(imageUrls));
+            }
             setImages(imageUrls);
         } catch (error) {
             console.error('エラーが発生しました: ', error);
