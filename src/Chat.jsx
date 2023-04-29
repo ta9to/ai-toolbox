@@ -1,302 +1,118 @@
-import {useEffect, Fragment, useState} from 'react';
-import { Configuration, OpenAIApi } from 'openai';
-class CustomFormData extends FormData {
-    getHeaders() {
-        return {}
-    }
-}
-
-import { CheckCircleIcon } from '@heroicons/react/24/solid'
-import {
-    FaceFrownIcon,
-    FaceSmileIcon,
-    FireIcon,
-    HandThumbUpIcon,
-    HeartIcon,
-    PaperClipIcon, UserCircleIcon,
-    XMarkIcon,
-} from '@heroicons/react/20/solid'
-import { Listbox, Transition } from '@headlessui/react'
-
-const activity = [
-    {
-        id: 1,
-        type: 'commented',
-        person: {
-            name: 'Chelsea Hagon',
-            imageUrl:
-                'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        },
-        comment: 'Called client, they reassured me the invoice would be paid by the 25th.',
-        date: '3d ago',
-        dateTime: '2023-01-23T15:56',
-    },
-]
-const moods = [
-    { name: 'Excited', value: 'excited', icon: FireIcon, iconColor: 'text-white', bgColor: 'bg-red-500' },
-    { name: 'Loved', value: 'loved', icon: HeartIcon, iconColor: 'text-white', bgColor: 'bg-pink-400' },
-    { name: 'Happy', value: 'happy', icon: FaceSmileIcon, iconColor: 'text-white', bgColor: 'bg-green-400' },
-    { name: 'Sad', value: 'sad', icon: FaceFrownIcon, iconColor: 'text-white', bgColor: 'bg-yellow-400' },
-    { name: 'Thumbsy', value: 'thumbsy', icon: HandThumbUpIcon, iconColor: 'text-white', bgColor: 'bg-blue-500' },
-    { name: 'I feel nothing', value: null, icon: XMarkIcon, iconColor: 'text-gray-400', bgColor: 'bg-transparent' },
-]
-
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
+import { useEffect, useState, useRef } from "react";
+import { Configuration, OpenAIApi } from "openai";
+import { OpenAIExt } from "openai-ext";
+import { useStorage } from "./useStorage";
+import { saveToStorage } from "./storageUtils.js";
 
 export default function Chat() {
-    const [selected, setSelected] = useState(moods[5])
-    const [apiKey, setApiKey] = useState('');
-    useEffect(() => {
-        if (chrome.storage) {
-            chrome.storage.local.get('openai_api_key', (data) => {
-                if (data.openai_api_key) {
-                    setApiKey(data.openai_api_key)
-                }
-            });
-        } else {
-            const storedApiKey = localStorage.getItem('openai_api_key');
-            if (storedApiKey) {
-                setApiKey(storedApiKey)
-            }
-        }
-    }, []);
-    const [prompt, setPrompt] = useState('');
-    const [comment, setComment] = useState('');
+    const [apiKey, setApiKey] = useStorage("openai_api_key");
     const [messages, setMessages] = useState([]);
-    const handlePromptChange = (e) => {
-        setPrompt(e.target.value);
+    const [inputMessage, setInputMessage] = useState("");
+    const [currentResponse, setCurrentResponse] = useState("");
+    const messagesEndRef = useRef(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     };
-    const handleCommentChange = (e) => {
-        setComment(e.target.value);
-    };
-    const exec = async (event) => {
-        event.preventDefault();
-        if (!comment) {
-            alert('コメントを入力してください。');
-            return;
+    const handleKeyPress = (e) => {
+        if (e.key === "Enter") {
+            sendMessage();
         }
-        const newMessage = {
-            id: messages.length,
-            type: 'commented',
-            person: {
-                name: 'user',
-                imageUrl:
-                    'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-            },
-            comment: comment,
-            date: '3d ago',
-            dateTime: '2023-01-23T15:56',
-        };
-        console.log(newMessage)
-        messages.push(newMessage);
-        setMessages(messages);
-        const configuration = new Configuration({
-            apiKey: apiKey,
-            formDataCtor: CustomFormData
-        });
-        const openai = new OpenAIApi(configuration);
-        try {
-            const _messages = messages.map((message) => {
-                return {
-                    'role': message.person.name,
-                    'content': message.comment,
+    };
+
+    useEffect(scrollToBottom, [messages]);
+
+    const streamConfig = {
+        apiKey: apiKey, // Your API key
+        handler: {
+            // Content contains the string draft, which may be partial. When isFinal is true, the completion is done.
+            onContent(content, isFinal, xhr) {
+                console.log(content, "isFinal?", isFinal);
+                setCurrentResponse(content);
+                if (isFinal) {
+                    const gptResponse = { role: "assistant", content: content };
+                    setMessages((prevMessages) => [...prevMessages, gptResponse]);
+                    setCurrentResponse("");
                 }
+            },
+            onDone(xhr) {
+                console.log("Done!");
+            },
+            onError(error, status, xhr) {
+                console.error(error);
+            },
+        },
+    };
+
+    const sendMessage = async () => {
+        if (apiKey) {
+            const configuration = new Configuration({
+                apiKey: apiKey,
             });
-            const response = await openai.createChatCompletion({
-                'model': 'gpt-3.5-turbo',
-                'messages': _messages,
-            });
-            const message = response.data.choices[0].message
-            const newMessage = {
-                id: messages.length+1,
-                type: 'commented',
-                person: {
-                    name: message.role,
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+            // メッセージを送信
+            const userMessage = { role: "user", content: inputMessage };
+            setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+            // Make the call and store a reference to the XMLHttpRequest
+            const xhr = OpenAIExt.streamClientChatCompletion(
+                {
+                    model: "gpt-3.5-turbo",
+                    messages: [...messages, userMessage],
                 },
-                comment: message.content,
-                date: '3d ago',
-                dateTime: '2023-01-23T15:56',
-            }
-            messages.push(newMessage);
-            setMessages(messages);
-            // streamで返ってくるので、response.dataで取得する
-        } catch (error) {
-            console.error('エラーが発生しました: ', error);
-        } finally {
-            document.getElementById('comment').value = '';
-            setComment('')
+                streamConfig
+            );
+            // 入力メッセージをクリア
+            setInputMessage("");
         }
     };
+
     return (
         <>
-            <ul role="list" className="space-y-6">
-                {messages.map((activityItem, activityItemIdx) => (
-                    <li key={activityItem.id} className="relative flex gap-x-4">
+            <div className="space-y-4">
+                {messages.map((message, index) => (
+                    <div
+                        key={index}
+                        className={`${
+                            message.role === "user" ? "text-right" : "text-left"
+                        }`}
+                    >
                         <div
-                            className={classNames(
-                                activityItemIdx === activity.length - 1 ? 'h-6' : '-bottom-6',
-                                'absolute left-0 top-0 flex w-6 justify-center'
-                            )}
+                            className={`${
+                                message.role === "user"
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-gray-300 text-gray-800"
+                            } inline-block px-4 py-2 rounded-lg`}
                         >
-                            <div className="w-px bg-gray-200" />
+                            {message.content}
                         </div>
-                        {activityItem.type === 'commented' ? (
-                            <>
-                                <img
-                                    src={activityItem.person.imageUrl}
-                                    alt=""
-                                    className="relative mt-3 h-6 w-6 flex-none rounded-full bg-gray-50"
-                                />
-                                <div className="flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200">
-                                    <div className="flex justify-between gap-x-4">
-                                        <div className="py-0.5 text-xs leading-5 text-gray-500">
-                                            <span className="font-medium text-gray-900">{activityItem.person.name}</span> commented
-                                        </div>
-                                        <time dateTime={activityItem.dateTime} className="flex-none py-0.5 text-xs leading-5 text-gray-500">
-                                            {activityItem.date}
-                                        </time>
-                                    </div>
-                                    <p className="text-sm leading-6 text-gray-500">{activityItem.comment}</p>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white">
-                                    {activityItem.type === 'paid' ? (
-                                        <CheckCircleIcon className="h-6 w-6 text-indigo-600" aria-hidden="true" />
-                                    ) : (
-                                        <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
-                                    )}
-                                </div>
-                                <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500">
-                                    <span className="font-medium text-gray-900">{activityItem.person.name}</span> {activityItem.type} the
-                                    invoice.
-                                </p>
-                                <time dateTime={activityItem.dateTime} className="flex-none py-0.5 text-xs leading-5 text-gray-500">
-                                    {activityItem.date}
-                                </time>
-                            </>
-                        )}
-                    </li>
+                    </div>
                 ))}
-            </ul>
-
-            {/* New comment form */}
-            <div className="mt-6 flex gap-x-3">
-                <UserCircleIcon className="h-6 w-6 flex-none rounded-full bg-gray-50" />
-                <form action="#" className="relative flex-auto">
-                    <div className="overflow-hidden rounded-lg pb-12 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
-                        <label htmlFor="comment" className="sr-only">
-                            Add your comment
-                        </label>
-                        <textarea
-                            rows={2}
-                            name="comment"
-                            id="comment"
-                            onChange={handleCommentChange}
-                            className="!outline-none block w-full resize-none border-0 bg-transparent px-3 py-1.5 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                            placeholder="Add your comment..."
-                            defaultValue={''}
-                        />
-                    </div>
-
-                    <div className="absolute inset-x-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
-                        <div className="flex items-center space-x-5">
-                            {/*<div className="flex items-center">*/}
-                            {/*    <button*/}
-                            {/*        type="button"*/}
-                            {/*        className="-m-2.5 flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"*/}
-                            {/*    >*/}
-                            {/*        <PaperClipIcon className="h-5 w-5" aria-hidden="true" />*/}
-                            {/*        <span className="sr-only">Attach a file</span>*/}
-                            {/*    </button>*/}
-                            {/*</div>*/}
-                            <div className="flex items-center">
-                                <Listbox value={selected} onChange={setSelected}>
-                                    {({ open }) => (
-                                        <>
-                                            <Listbox.Label className="sr-only"> Your mood </Listbox.Label>
-                                            <div className="relative">
-                                                <Listbox.Button className="relative -m-2.5 flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500">
-                          <span className="flex items-center justify-center">
-                            {selected.value === null ? (
-                                <span>
-                                <FaceSmileIcon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
-                                <span className="sr-only"> Add your mood </span>
-                              </span>
-                            ) : (
-                                <span>
-                                <span
-                                    className={classNames(
-                                        selected.bgColor,
-                                        'flex h-8 w-8 items-center justify-center rounded-full'
-                                    )}
-                                >
-                                  <selected.icon className="h-5 w-5 flex-shrink-0 text-white" aria-hidden="true" />
-                                </span>
-                                <span className="sr-only">{selected.name}</span>
-                              </span>
-                            )}
-                          </span>
-                                                </Listbox.Button>
-
-                                                <Transition
-                                                    show={open}
-                                                    as={Fragment}
-                                                    leave="transition ease-in duration-100"
-                                                    leaveFrom="opacity-100"
-                                                    leaveTo="opacity-0"
-                                                >
-                                                    <Listbox.Options className="absolute bottom-10 z-10 -ml-6 w-60 rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:ml-auto sm:w-64 sm:text-sm">
-                                                        {moods.map((mood) => (
-                                                            <Listbox.Option
-                                                                key={mood.value}
-                                                                className={({ active }) =>
-                                                                    classNames(
-                                                                        active ? 'bg-gray-100' : 'bg-white',
-                                                                        'relative cursor-default select-none px-3 py-2'
-                                                                    )
-                                                                }
-                                                                value={mood}
-                                                            >
-                                                                <div className="flex items-center">
-                                                                    <div
-                                                                        className={classNames(
-                                                                            mood.bgColor,
-                                                                            'flex h-8 w-8 items-center justify-center rounded-full'
-                                                                        )}
-                                                                    >
-                                                                        <mood.icon
-                                                                            className={classNames(mood.iconColor, 'h-5 w-5 flex-shrink-0')}
-                                                                            aria-hidden="true"
-                                                                        />
-                                                                    </div>
-                                                                    <span className="ml-3 block truncate font-medium">{mood.name}</span>
-                                                                </div>
-                                                            </Listbox.Option>
-                                                        ))}
-                                                    </Listbox.Options>
-                                                </Transition>
-                                            </div>
-                                        </>
-                                    )}
-                                </Listbox>
-                            </div>
+                {currentResponse && (
+                    <div className="text-left">
+                        <div className="bg-gray-200 text-gray-700 inline-block px-4 py-2 rounded-lg">
+                            {currentResponse}
                         </div>
-                        <button
-                            type="submit"
-                            onClick={exec}
-                            className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                        >
-                            Comment
-                        </button>
                     </div>
-                </form>
+                )}
+                <div ref={messagesEndRef}></div>
+            </div>
+            <div className="mt-6 flex justify-between">
+                <input
+                    type="text"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                />
+                <button
+                    onClick={sendMessage}
+                    className="ml-4 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                    </svg>
+                </button>
             </div>
         </>
-    )
+    );
 }
