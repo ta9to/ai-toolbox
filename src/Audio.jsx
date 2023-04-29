@@ -1,5 +1,8 @@
 import {useEffect, useState} from 'react';
 import { Configuration, OpenAIApi } from 'openai';
+import { useStorage } from "./useStorage";
+import { saveToStorage } from './storageUtils';
+
 class CustomFormData extends FormData {
     getHeaders() {
         return {}
@@ -7,33 +10,10 @@ class CustomFormData extends FormData {
 }
 
 export default function Audio() {
-    const [apiKey, setApiKey] = useState('');
-    useEffect(() => {
-        if (chrome.storage) {
-            chrome.storage.local.get('openai_api_key', (data) => {
-                if (data.openai_api_key) {
-                    setApiKey(data.openai_api_key)
-                }
-            });
-            chrome.storage.local.get('translated_text', (data) => {
-                if (data.translated_text) {
-                    setTranscription(data.translated_text)
-                }
-            });
-        } else {
-            const storedApiKey = localStorage.getItem('openai_api_key');
-            if (storedApiKey) {
-                setApiKey(storedApiKey)
-            }
-            const translatedText = localStorage.getItem('translated_text');
-            if (translatedText) {
-                setTranscription(translatedText)
-            }
-        }
-    }, []);
+    const [apiKey, setApiKey] = useStorage("openai_api_key");
+    const [transcription, setTranscription] = useStorage("translated_text", false, '');
     const [file, setFile] = useState(null);
     const [prompt, setPrompt] = useState('');
-    const [transcription, setTranscription] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -54,11 +34,7 @@ export default function Audio() {
         setIsLoading(true);
         try {
             const response = await openai.createTranscription(file, 'whisper-1', prompt);
-            if (chrome.storage) {
-                chrome.storage.local.set({ translated_text: response.data.text });
-            } else {
-                localStorage.setItem('translated_text', response.data.text);
-            }
+            saveToStorage('translated_text', response.data.text);
             setTranscription(response.data.text);
         } catch (error) {
             console.error('エラーが発生しました: ', error);

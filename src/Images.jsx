@@ -1,5 +1,7 @@
 import {useEffect, useState} from 'react';
 import { Configuration, OpenAIApi } from 'openai';
+import { useStorage } from "./useStorage";
+import { saveToStorage } from "./storageUtils.js";
 class CustomFormData extends FormData {
     getHeaders() {
         return {}
@@ -12,35 +14,13 @@ function getSigValue(url) {
 }
 
 export default function Images() {
-    const [apiKey, setApiKey] = useState('');
-    useEffect(() => {
-        if (chrome.storage) {
-            chrome.storage.local.get('openai_api_key', (data) => {
-                if (data.openai_api_key) {
-                    setApiKey(data.openai_api_key)
-                }
-            });
-            chrome.storage.local.get('image_urls', (data) => {
-                if (data.image_urls) {
-                    setImages(JSON.parse(data.image_urls))
-                }
-            });
-        } else {
-            const storedApiKey = localStorage.getItem('openai_api_key');
-            if (storedApiKey) {
-                setApiKey(storedApiKey)
-            }
-            const imageUrls = localStorage.getItem('image_urls');
-            if (imageUrls) {
-                setImages(JSON.parse(imageUrls))
-            }
-        }
-    }, []);
-    const [prompt, setPrompt] = useState('');
-    const [images, setImages] = useState([]);
+    const [apiKey, setApiKey] = useStorage("openai_api_key");
+    const [images, setImages] = useStorage("image_urls", true, []);
+    const [prompt, setPrompt] = useStorage("image_prompt", false, "A painting of a cat sitting on a chair.");
     const [isLoading, setIsLoading] = useState(false);
 
     const handlePromptChange = (e) => {
+        saveToStorage('image_prompt', e.target.value);
         setPrompt(e.target.value);
     };
     const downloadImage = (imageUrl) => {
@@ -74,11 +54,7 @@ export default function Images() {
         try {
             const response = await openai.createImage(createImageRequest);
             const imageUrls = response.data.data.map((imageData) => imageData.url);
-            if (chrome.storage) {
-                chrome.storage.local.set({ image_urls: JSON.stringify(imageUrls) });
-            } else {
-                localStorage.setItem('image_urls', JSON.stringify(imageUrls));
-            }
+            saveToStorage('image_urls', imageUrls, true);
             setImages(imageUrls);
         } catch (error) {
             console.error('エラーが発生しました: ', error);
