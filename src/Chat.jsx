@@ -1,17 +1,40 @@
 import { useEffect, useState, useRef } from "react";
-import { Configuration, OpenAIApi } from "openai";
+import { Configuration } from "openai";
 import { OpenAIExt } from "openai-ext";
 import { useStorage } from "./useStorage";
 import { saveToStorage } from "./storageUtils.js";
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import AlertMessage from "./AlertMessage";
+import {
+    FaceFrownIcon,
+    FaceSmileIcon,
+    FireIcon,
+    HandThumbUpIcon,
+    HeartIcon,
+    XMarkIcon,
+} from '@heroicons/react/20/solid'
+import MessageInput from "./MessageInput";
+import MessageList from './MessageList';
+
+const moods = [
+    { name: 'Excited', value: 'excited', icon: FireIcon, iconColor: 'text-white', bgColor: 'bg-red-500' },
+    { name: 'Loved', value: 'loved', icon: HeartIcon, iconColor: 'text-white', bgColor: 'bg-pink-400' },
+    { name: 'Happy', value: 'happy', icon: FaceSmileIcon, iconColor: 'text-white', bgColor: 'bg-green-400' },
+    { name: 'Sad', value: 'sad', icon: FaceFrownIcon, iconColor: 'text-white', bgColor: 'bg-yellow-400' },
+    { name: 'Thumbsy', value: 'thumbsy', icon: HandThumbUpIcon, iconColor: 'text-white', bgColor: 'bg-blue-500' },
+    { name: 'I feel nothing', value: null, icon: XMarkIcon, iconColor: 'text-gray-400', bgColor: 'bg-transparent' },
+]
+
+function classNames(...classes) {
+    return classes.filter(Boolean).join(' ')
+}
 
 export default function Chat() {
+    const [selected, setSelected] = useState(moods[5])
     const [apiKey, setApiKey] = useStorage("openai_api_key");
     const [messages, setMessages] = useStorage("chat_messages", true, [])
     useEffect(() => {
         if (messages.length > 0) {
+            scrollToBottom();
             saveToStorage("chat_messages", messages, true);
         }
     }, [messages]);
@@ -19,8 +42,13 @@ export default function Chat() {
     const [currentResponse, setCurrentResponse] = useState("");
     const [chatPrompt, setChatPrompt] = useStorage("chat_prompt", false, '');
     const messagesEndRef = useRef(null);
+    useEffect(() => {
+        scrollToBottom();
+    }, [currentResponse]);
 
     const scrollToBottom = () => {
+        console.log("Scrolling to bottom...");
+        console.log(messagesEndRef.current)
         messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     };
     const handleKeyPress = (e) => {
@@ -39,16 +67,21 @@ export default function Chat() {
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
-        // 2. copyToClipboard関数が実行されたときに、アラートメッセージを表示するようにします。
         setAlertVisible(true);
-
-        // 3. アラートメッセージが表示されてから一定時間経過したら、自動的に非表示にするようにします。
         setTimeout(() => {
             setAlertVisible(false);
         }, 3000);
     };
+    const resetMessages = () => {
+        // ユーザーに会話履歴のリセットを確認するアラートを表示
+        const confirmReset = window.confirm("会話の履歴をリセットしてもよろしいですか？");
 
-    useEffect(scrollToBottom, [messages]);
+        // ユーザーが [OK] をクリックした場合、処理を実行
+        if (confirmReset) {
+            setMessages([]);
+            saveToStorage("chat_messages", [], true);
+        }
+    };
 
     const streamConfig = {
         apiKey: apiKey, // Your API key
@@ -71,20 +104,25 @@ export default function Chat() {
         },
     };
 
-    const sendMessage = async () => {
+    const sendMessage = async (event) => {
+        event.preventDefault();
+        if (inputMessage === '') {
+            return;
+        }
         if (apiKey) {
             const configuration = new Configuration({
                 apiKey: apiKey,
             });
             // メッセージを送信
-            const systemMessage = { role: "system", content: chatPrompt };
+            const userMood = selected.value !== null ? selected.value : 'usually';
+            const systemMessage = { role: "system", content: `${chatPrompt} User mood is ${userMood}`};
             const userMessage = { role: "user", content: inputMessage };
             setMessages((prevMessages) => [...prevMessages, userMessage]);
             // Make the call and store a reference to the XMLHttpRequest
             const xhr = OpenAIExt.streamClientChatCompletion(
                 {
                     model: "gpt-3.5-turbo",
-                    messages: [...messages, userMessage, systemMessage],
+                    messages: [systemMessage, ...messages, userMessage],
                 },
                 streamConfig
             );
@@ -97,73 +135,22 @@ export default function Chat() {
         <>
             <AlertMessage alertVisible={alertVisible} onClose={handleClose} />
             <div className="flex flex-col h-470">
-                <div className="flex-grow space-y-4 overflow-auto">
-                    {messages.map((message, index) => (
-                        <div
-                            key={index}
-                            className={`${
-                                message.role === "user" ? "text-right" : "text-left"
-                            }`}
-                        >
-                            <div
-                                onClick={() => copyToClipboard(message.content)}
-                                className={`${
-                                    message.role === "user"
-                                        ? "bg-indigo-600 text-white"
-                                        : "bg-gray-300 text-gray-800"
-                                } inline-block px-4 py-2 rounded-lg`}
-                            >
-                                <ReactMarkdown
-                                    children={message.content}
-                                    remarkPlugins={[remarkGfm]}
-                                    components={{
-                                        table: ({ node, ...props }) => (
-                                            <table {...props} className="min-w-full divide-y divide-gray-300" />
-                                        ),
-                                        tbody: ({ node, ...props }) => (
-                                            <tbody {...props} className="divide-y divide-gray-200" />
-                                        ),
-                                        th: ({ node, ...props }) => (
-                                            <th {...props} className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" />
-                                        ),
-                                        td: ({ node, ...props }) => (
-                                            <td {...props} className="whitespace-nowrap px-3 py-4 text-sm text-gray-500" />
-                                        ),
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    ))}
-                    {currentResponse && (
-                        <div className="text-left">
-                            <div className="bg-gray-200 text-gray-700 inline-block px-4 py-2 rounded-lg">
-                                {currentResponse}
-                            </div>
-                        </div>
-                    )}
-                    <div ref={messagesEndRef}></div>
-                </div>
-                <div className="w-full border-t dark:border-white/20 md:border-transparent md:dark:border-transparent pt-2">
-                    <div className="mt-6 flex justify-between mx-2">
-                        <input
-                            type="text"
-                            value={inputMessage}
-                            onChange={(e) => setInputMessage(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                        />
-                        <button
-                            onClick={sendMessage}
-                            className="ml-4 p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+                <MessageList
+                    messages={messages}
+                    currentResponse={currentResponse}
+                    copyToClipboard={copyToClipboard}
+                    messagesEndRef={messagesEndRef}
+                />
+                <MessageInput
+                    inputMessage={inputMessage}
+                    setInputMessage={setInputMessage}
+                    resetMessages={resetMessages}
+                    sendMessage={sendMessage}
+                    selected={selected}
+                    setSelected={setSelected}
+                    moods={moods}
+                />
             </div>
-
         </>
     );
 }
