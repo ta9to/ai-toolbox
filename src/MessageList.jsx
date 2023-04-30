@@ -1,10 +1,19 @@
-import React from 'react';
+import { useEffect, useRef } from "react";
+
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { UserCircleIcon } from '@heroicons/react/20/solid'
 import { classNames } from './utils';
 
-const MessageList = ({ messages, currentResponse, copyToClipboard, messagesEndRef }) => {
+const MessageList = ({ messages, currentResponse, copyToClipboard }) => {
+    const messagesEndRef = useRef(null);
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages, currentResponse]);
+    const scrollToBottom = () => {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    };
+
     return (
         <ul className="flex-grow space-y-4 overflow-auto">
             {messages.map((message, index) => (
@@ -28,7 +37,18 @@ const MessageList = ({ messages, currentResponse, copyToClipboard, messagesEndRe
                             children={message.content}
                             remarkPlugins={[remarkGfm]}
                             components={{
-                                // Add custom components here
+                                table: ({ node, ...props }) => (
+                                    <table {...props} className="min-w-full divide-y divide-gray-300" />
+                                ),
+                                tbody: ({ node, ...props }) => (
+                                    <tbody {...props} className="divide-y divide-gray-200" />
+                                ),
+                                // th: ({ node, ...props }) => (
+                                //     <th {...props} className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" />
+                                // ),
+                                // td: ({ node, ...props }) => (
+                                //     <td {...props} className="whitespace-nowrap px-3 py-4 text-sm text-gray-500" />
+                                // ),
                             }}
                         />
                     </div>

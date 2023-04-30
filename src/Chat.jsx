@@ -24,33 +24,18 @@ const moods = [
     { name: 'I feel nothing', value: null, icon: XMarkIcon, iconColor: 'text-gray-400', bgColor: 'bg-transparent' },
 ]
 
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
-
 export default function Chat() {
     const [selected, setSelected] = useState(moods[5])
     const [apiKey, setApiKey] = useStorage("openai_api_key");
     const [messages, setMessages] = useStorage("chat_messages", true, [])
     useEffect(() => {
         if (messages.length > 0) {
-            scrollToBottom();
             saveToStorage("chat_messages", messages, true);
         }
     }, [messages]);
     const [inputMessage, setInputMessage] = useState("");
     const [currentResponse, setCurrentResponse] = useState("");
     const [chatPrompt, setChatPrompt] = useStorage("chat_prompt", false, '');
-    const messagesEndRef = useRef(null);
-    useEffect(() => {
-        scrollToBottom();
-    }, [currentResponse]);
-
-    const scrollToBottom = () => {
-        console.log("Scrolling to bottom...");
-        console.log(messagesEndRef.current)
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    };
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {
             sendMessage();
@@ -139,7 +124,6 @@ export default function Chat() {
                     messages={messages}
                     currentResponse={currentResponse}
                     copyToClipboard={copyToClipboard}
-                    messagesEndRef={messagesEndRef}
                 />
                 <MessageInput
                     inputMessage={inputMessage}
