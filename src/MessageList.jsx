@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -7,12 +7,20 @@ import { classNames } from './utils';
 
 const MessageList = ({ messages, currentResponse, copyToClipboard }) => {
     const messagesEndRef = useRef(null);
+    const [scrolling, setScrolling] = useState(false);
     useEffect(() => {
         scrollToBottom();
-    }, [messages, currentResponse]);
+    }, [messages.length, currentResponse]);
     const scrollToBottom = () => {
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        if (!scrolling) {
+            setScrolling(true);
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+            setTimeout(() => setScrolling(false), 500);
+        }
     };
+    useEffect(() => {
+        setTimeout(() => scrollToBottom(), 100);
+    }, []);
 
     return (
         <ul className="flex-grow space-y-4 overflow-auto">
@@ -65,7 +73,7 @@ const MessageList = ({ messages, currentResponse, copyToClipboard }) => {
                     </div>
                 </li>
             )}
-            <div ref={messagesEndRef}></div>
+            <li ref={messagesEndRef}></li>
         </ul>
     );
 };
