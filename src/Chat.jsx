@@ -5,7 +5,7 @@ import { useStorage } from "./useStorage";
 import { saveToStorage } from "./storageUtils.js";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { CheckCircleIcon, XMarkIcon } from '@heroicons/react/20/solid'
+import AlertMessage from "./AlertMessage";
 
 export default function Chat() {
     const [apiKey, setApiKey] = useStorage("openai_api_key");
@@ -18,7 +18,6 @@ export default function Chat() {
     const [inputMessage, setInputMessage] = useState("");
     const [currentResponse, setCurrentResponse] = useState("");
     const [chatPrompt, setChatPrompt] = useStorage("chat_prompt", false, '');
-    const [alertVisible, setAlertVisible] = useState(false);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -28,6 +27,10 @@ export default function Chat() {
         if (e.key === "Enter") {
             sendMessage();
         }
+    };
+    const [alertVisible, setAlertVisible] = useState(false);
+    const handleClose = () => {
+        setAlertVisible(false);
     };
     const copyToClipboard = (text) => {
         const el = document.createElement('textarea');
@@ -92,29 +95,7 @@ export default function Chat() {
 
     return (
         <>
-            {alertVisible && (
-                <div className="fixed top-4 right-4 rounded-md bg-green-50 p-4">
-                    <div className="flex">
-                        <div className="flex-shrink-0">
-                            <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />
-                        </div>
-                        <div className="ml-3">
-                            <p className="text-sm font-medium text-green-800">コピーしました</p>
-                        </div>
-                        <div className="ml-auto pl-3">
-                            <div className="-mx-1.5 -my-1.5">
-                                <button
-                                    type="button"
-                                    className="inline-flex rounded-md bg-green-50 p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-green-50"
-                                >
-                                    <span className="sr-only">Dismiss</span>
-                                    <XMarkIcon className="h-5 w-5" aria-hidden="true" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <AlertMessage alertVisible={alertVisible} onClose={handleClose} />
             <div className="flex flex-col h-470">
                 <div className="flex-grow space-y-4 overflow-auto">
                     {messages.map((message, index) => (
