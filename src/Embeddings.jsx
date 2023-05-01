@@ -69,6 +69,7 @@ export default function Audio() {
                 if (isFinal) {
                     const response = {'question': query, 'answer': content};
                     setFaqs([response, ...faqs]);
+                    setQuery("")
                     setCurrentResponse("");
                 }
             },
