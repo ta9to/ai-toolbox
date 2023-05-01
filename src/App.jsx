@@ -4,6 +4,7 @@ import Settings from "./Settings.jsx";
 import Images from "./Images";
 import Audio from "./Audio";
 import Chat from "./Chat";
+import Embeddings from "./Embeddings";
 import { useStorage } from "./useStorage";
 import { saveToStorage } from './storageUtils';
 
@@ -68,6 +69,18 @@ export default function App() {
                                             )
                                         }
                                     >
+                                        Embeddings
+                                    </Tab>
+                                    <Tab
+                                        className={({ selected }) =>
+                                            classNames(
+                                                selected
+                                                    ? 'border-indigo-600 text-indigo-600'
+                                                    : 'border-transparent text-gray-700 hover:border-gray-300 hover:text-gray-800',
+                                                '!outline-none whitespace-nowrap border-b-2 py-6 text-sm font-medium'
+                                            )
+                                        }
+                                    >
                                         Audio
                                     </Tab>
                                     <Tab
@@ -87,6 +100,7 @@ export default function App() {
                             <Tab.Panels as={Fragment}>
                                 <Tab.Panel className="pt-10"><Chat /></Tab.Panel>
                                 <Tab.Panel className="pt-10"><Images /></Tab.Panel>
+                                <Tab.Panel className="pt-10"><Embeddings /></Tab.Panel>
                                 <Tab.Panel className="pt-10"><Audio /></Tab.Panel>
                                 <Tab.Panel className="pt-10"><Settings /></Tab.Panel>
                             </Tab.Panels>
