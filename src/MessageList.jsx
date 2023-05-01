@@ -13,9 +13,11 @@ const MessageList = ({ messages, currentResponse, copyToClipboard }) => {
     }, [messages.length, currentResponse]);
     const scrollToBottom = () => {
         if (!scrolling) {
-            setScrolling(true);
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-            setTimeout(() => setScrolling(false), 500);
+            if (messagesEndRef.current) {
+                setScrolling(true);
+                messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+                setTimeout(() => setScrolling(false), 500);
+            }
         }
     };
     useEffect(() => {
