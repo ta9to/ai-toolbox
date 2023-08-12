@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Tabs, Tab } from "@nextui-org/react";
 import Settings from "./Settings.jsx";
 import Images from "./Images";
