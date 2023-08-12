@@ -35,7 +35,7 @@ export default function App() {
     const [theme,] = useStorage("theme", false, 'light');
 
     return (
-        <main className={theme === 'light' ? 'light' : 'dark text-foreground bg-background'}>
+        <main className={theme === 'light' ? 'light' : 'dark text-foreground bg-background min-h-screen'}>
             <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
                 <div className="mx-auto w-full max-w-2xl lg:col-span-4 lg:mt-0 lg:max-w-none">
                     <Tabs
@@ -44,9 +44,8 @@ export default function App() {
                         variant="underlined"
                         classNames={{
                             tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
-                            cursor: "w-full bg-indigo-500",
+                            cursor: "w-full",
                             tab: "max-w-fit px-0 h-12",
-                            tabContent: "group-data-[selected=true]:text-[#4F46E5]"
                         }}
                         selectedKey={activeTab}
                         onSelectionChange={handleTabChange}
