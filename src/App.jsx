@@ -16,8 +16,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function App() {
-    const [activeTab, setActiveTab] = useState(0);
-    const [isFirstRender, setIsFirstRender] = useState(true);
+    const [activeTab, setActiveTab] = useState('0');
 
     useEffect(() => {
         getFromStorage("active_tab").then((value) => {
@@ -25,17 +24,9 @@ export default function App() {
         });
     }, []);
 
-    useEffect(() => {
-        if (isFirstRender) {
-            setIsFirstRender(false);
-        }
-    }, [isFirstRender]);
-
     const handleTabChange = (index) => {
-        if (!isFirstRender) {
-            setActiveTab(index);
-            saveToStorage("active_tab", index);
-        }
+        setActiveTab(index);
+        saveToStorage("active_tab", index)
     };
 
     const tabs = [
@@ -49,7 +40,6 @@ export default function App() {
     return (
         <div className="bg-white">
             <main>
-                {/* Product */}
                 <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
                     <div className="mx-auto w-full max-w-2xl lg:col-span-4 lg:mt-0 lg:max-w-none">
                         <Tabs
@@ -63,7 +53,7 @@ export default function App() {
                                 tabContent: "group-data-[selected=true]:text-[#4F46E5]"
                             }}
                             selectedKey={activeTab}
-                            onSelectionChange={(index) => { handleTabChange(index)}}
+                            onSelectionChange={handleTabChange}
                         >
                             {tabs.map((tab, index) => (
                                 <Tab
