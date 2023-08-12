@@ -11,9 +11,11 @@
   "dependencies": {
     "@headlessui/react": "^1.7.13",
     "@heroicons/react": "^2.0.17",
+    "@nextui-org/react": "^2.0.12",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.9",
+    "framer-motion": "^10.15.1",
     "mathjs": "^11.8.0",
     "openai": "^3.2.1",
     "openai-ext": "^1.2.6",

@@ -30,7 +30,7 @@ const Settings = () => {
     };
 
     return (
-        <div className="bg-white shadow sm:rounded-lg">
+        <div className="bg-white sm:rounded-lg">
             <div className="px-4 py-5 sm:p-6">
                 <h3 className="text-base font-semibold leading-6 text-gray-900">Set your API key</h3>
                 <form className="mt-5 sm:flex sm:items-center" onSubmit={handleSubmit}>

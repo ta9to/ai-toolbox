@@ -5,3 +5,13 @@ export function saveToStorage(key, value, isJSON = false) {
         localStorage.setItem(key, isJSON ? JSON.stringify(value) : value);
     }
 }
+
+export function getFromStorage(key) {
+    return new Promise((resolve) => {
+        if (chrome.storage) {
+            chrome.storage.local.get(key, (result) => resolve(result));
+        } else {
+            resolve(localStorage.getItem(key));
+        }
+    });
+}
