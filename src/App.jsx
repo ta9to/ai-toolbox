@@ -5,7 +5,8 @@ import Images from "./Images";
 import Audio from "./Audio";
 import Chat from "./Chat";
 import Embeddings from "./Embeddings";
-import { saveToStorage, getFromStorage } from './storageUtils';
+import { saveToStorage } from './storageUtils';
+import { useStorage } from "./useStorage";
 
 import {
     ChatBubbleLeftEllipsisIcon,
@@ -16,13 +17,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function App() {
-    const [activeTab, setActiveTab] = useState('0');
-
-    useEffect(() => {
-        getFromStorage("active_tab").then((value) => {
-            if (value != null) setActiveTab(value);
-        });
-    }, []);
+    const [activeTab, setActiveTab] = useStorage('active_tab', false, '0');
 
     const handleTabChange = (index) => {
         setActiveTab(index);
