@@ -37,7 +37,7 @@ export default function App() {
     return (
         <main className={theme === 'light' ? 'light' : 'dark text-foreground bg-background min-h-screen'}>
             <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
-                <div className="mx-auto w-full max-w-2xl lg:col-span-4 lg:mt-0 lg:max-w-none">
+                <div className="mx-auto w-full max-w-3xl lg:col-span-4 lg:mt-0 lg:max-w-none">
                     <Tabs
                         aria-label="Options"
                         color="primary"
