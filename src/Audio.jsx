@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { Configuration, OpenAIApi } from 'openai';
 import { useStorage } from "./useStorage";
 import { saveToStorage } from './storageUtils';
+import { truncateString } from './utils';
 class CustomFormData extends FormData {
     getHeaders() {
         return {}
@@ -42,13 +43,6 @@ export default function Audio() {
             saveToStorage("audio_enabled", enabled)
         }
     }, [enabled]);
-    const truncateString = (str, maxLength) => {
-        if (str.length > maxLength) {
-            return str.slice(0, maxLength) + '...';
-        } else {
-            return str;
-        }
-    }
     const copyToClipboard = (text) => {
         const el = document.createElement('textarea');
         el.value = text;
