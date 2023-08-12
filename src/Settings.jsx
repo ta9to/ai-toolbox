@@ -152,9 +152,8 @@ export default function Settings() {
                             <div className="col-span-full">
                                 <div className="mt-2">
                                     <Textarea
+                                        label="Your Chat Prompt"
                                         minRows={6}
-                                        labelPlacement="outside"
-                                        placeholder="Enter your chat prompt here..."
                                         value={chatPrompt}
                                         onChange={(e) => setChatPrompt(e.target.value)}
                                     />
