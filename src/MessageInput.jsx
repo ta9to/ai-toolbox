@@ -1,23 +1,21 @@
 import React from "react";
 import {
+    Textarea,
+    Button,
+} from "@nextui-org/react";
+import {
     XCircleIcon,
-    UserCircleIcon,
-} from '@heroicons/react/20/solid'
-import MoodSelector from "./MoodSelector";
+    PaperAirplaneIcon,
+} from '@heroicons/react/24/outline'
 
-const MessageInput = ({ inputMessage, setInputMessage, resetMessages, sendMessage, selected, setSelected, moods }) => {
+const MessageInput = ({ inputMessage, setInputMessage, resetMessages, sendMessage }) => {
     return (
         <div className="mt-6 flex gap-x-3">
-            <UserCircleIcon className="h-6 w-6 flex-none rounded-full bg-gray-50" aria-hidden="true" />
             <form action="#" className="relative flex-auto">
-                <div className="overflow-hidden rounded-lg pb-12 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label htmlFor="comment" className="sr-only">
-                        Add your comment
-                    </label>
-                    <textarea
+                <div className="overflow-hidden rounded-lg pb-12">
+                    <Textarea
                         rows={2}
-                        className="!outline-none px-3 block w-full resize-none border-0 bg-transparent py-1.5 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                        placeholder="Add your message..."
+                        className="px-3 block py-1.5 sm:text-sm sm:leading-6"
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
                     />
@@ -35,18 +33,18 @@ const MessageInput = ({ inputMessage, setInputMessage, resetMessages, sendMessag
                                 <span className="sr-only">Reset messages</span>
                             </button>
                         </div>
-                        <div className="flex items-center">
-                            <MoodSelector selected={selected} setSelected={setSelected} moods={moods} />
-                        </div>
+                        {/*<div className="flex items-center"></div>*/}
+                        {/*<div className="flex items-center"></div>*/}
                     </div>
-                    <button
+                    <Button
+                        isIconOnly
+                        color="primary"
+                        aria-label="Send"
+                        className="mr-1"
                         onClick={sendMessage}
-                        className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-400">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                        </svg>
-                    </button>
+                        <PaperAirplaneIcon className="h-6 w-6" />
+                    </Button>
                 </div>
             </form>
         </div>

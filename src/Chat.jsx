@@ -4,28 +4,10 @@ import { OpenAIExt } from "openai-ext";
 import { useStorage } from "./useStorage";
 import { saveToStorage } from "./storageUtils.js";
 import AlertMessage from "./AlertMessage";
-import {
-    FaceFrownIcon,
-    FaceSmileIcon,
-    FireIcon,
-    HandThumbUpIcon,
-    HeartIcon,
-    XMarkIcon,
-} from '@heroicons/react/20/solid'
 import MessageInput from "./MessageInput";
 import MessageList from './MessageList';
 
-const moods = [
-    { name: 'Excited', value: 'excited', icon: FireIcon, iconColor: 'text-white', bgColor: 'bg-red-500' },
-    { name: 'Loved', value: 'loved', icon: HeartIcon, iconColor: 'text-white', bgColor: 'bg-pink-400' },
-    { name: 'Happy', value: 'happy', icon: FaceSmileIcon, iconColor: 'text-white', bgColor: 'bg-green-400' },
-    { name: 'Sad', value: 'sad', icon: FaceFrownIcon, iconColor: 'text-white', bgColor: 'bg-yellow-400' },
-    { name: 'Thumbsy', value: 'thumbsy', icon: HandThumbUpIcon, iconColor: 'text-white', bgColor: 'bg-blue-500' },
-    { name: 'I feel nothing', value: null, icon: XMarkIcon, iconColor: 'text-gray-400', bgColor: 'bg-transparent' },
-]
-
 export default function Chat() {
-    const [selected, setSelected] = useState(moods[5])
     const [apiKey, setApiKey] = useStorage("openai_api_key");
     const [messages, setMessages] = useStorage("chat_messages", true, [])
     useEffect(() => {
@@ -52,10 +34,6 @@ export default function Chat() {
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
-        setAlertVisible(true);
-        setTimeout(() => {
-            setAlertVisible(false);
-        }, 3000);
     };
     const resetMessages = () => {
         // ユーザーに会話履歴のリセットを確認するアラートを表示
@@ -99,8 +77,7 @@ export default function Chat() {
                 apiKey: apiKey,
             });
             // メッセージを送信
-            const userMood = selected.value !== null ? selected.value : 'usually';
-            const systemMessage = { role: "system", content: `${chatPrompt} User mood is ${userMood}`};
+            const systemMessage = { role: "system", content: `${chatPrompt}`};
             const userMessage = { role: "user", content: inputMessage };
             setMessages((prevMessages) => [...prevMessages, userMessage]);
             // Make the call and store a reference to the XMLHttpRequest
@@ -119,7 +96,7 @@ export default function Chat() {
     return (
         <>
             <AlertMessage alertVisible={alertVisible} onClose={handleClose} />
-            <div className="flex flex-col h-470">
+            <div className="flex flex-col h-527">
                 <MessageList
                     messages={messages}
                     currentResponse={currentResponse}
@@ -130,9 +107,6 @@ export default function Chat() {
                     setInputMessage={setInputMessage}
                     resetMessages={resetMessages}
                     sendMessage={sendMessage}
-                    selected={selected}
-                    setSelected={setSelected}
-                    moods={moods}
                 />
             </div>
         </>
