@@ -30,7 +30,7 @@ export default function Embeddings() {
     const [input, setInput] = useState("");
     const [embeddings, setEmbeddings] = useStorage("embeddings_index", true, []);
     useEffect(() => {
-        if (embeddings.length > 0) {
+        if (embeddings && embeddings.length > 0) {
             saveToStorage("embeddings_index", embeddings, true);
         }
     }, [embeddings]);
@@ -115,10 +115,10 @@ export default function Embeddings() {
                     <TableColumn>VECTOR</TableColumn>
                     <TableColumn>ACTIONS</TableColumn>
                 </TableHeader>
-                { embeddings.length === 0 && (
+                { embeddings && embeddings.length === 0 && (
                     <TableBody emptyContent={"No rows to display."}>{[]}</TableBody>
                 )}
-                { embeddings.length > 0 && (
+                { embeddings && embeddings.length > 0 && (
                     <TableBody>
                         {embeddings.map((row, index) => (
                             <TableRow key={index}>
