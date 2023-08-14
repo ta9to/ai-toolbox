@@ -6,6 +6,7 @@ import {
     Input,
     Button,
     Image,
+    Skeleton,
 } from "@nextui-org/react";
 import {
     ArrowDownOnSquareIcon,
@@ -121,6 +122,13 @@ export default function Images() {
             </form>
 
             <ul role="list" className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                {imageUrls.length === 0 && (
+                    <>
+                        <li className="relative"><Skeleton className="rounded-lg"><div className="h-48 rounded-lg bg-default-300"></div></Skeleton></li>
+                        <li className="relative"><Skeleton className="rounded-lg"><div className="h-48 rounded-lg bg-default-300"></div></Skeleton></li>
+                        <li className="relative"><Skeleton className="rounded-lg"><div className="h-48 rounded-lg bg-default-300"></div></Skeleton></li>
+                    </>
+                )}
                 {imageUrls.map((url, index) => (
                     <li key={url} className="relative">
                         <Image
