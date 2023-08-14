@@ -3,24 +3,18 @@ import {
     Input,
     Button,
     Link,
-    RadioGroup,
-    Radio,
     Textarea,
 } from "@nextui-org/react";
-import { Fragment, useState } from 'react'
-import { useStorage } from "./useStorage";
-import { saveToStorage } from './storageUtils';
-
 import {
     EyeIcon,
     EyeSlashIcon,
 } from '@heroicons/react/24/outline'
+import { Fragment, useState } from 'react'
+import { useStorage } from "./useStorage";
+import { saveToStorage } from './storageUtils';
+import ThemeSelector from "./components/ThemeSelector";
 
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
-
-export default function Settings() {
+export default function Settings({ theme, setTheme }) {
     const [isVisible, setIsVisible] = React.useState(false);
     const toggleVisibility = () => setIsVisible(!isVisible);
     const [openaiApiKey, setOpenaiApiKey] = useStorage("openai_api_key", false, '');
@@ -35,14 +29,13 @@ export default function Settings() {
     };
 
     const [themeIsLoading, setThemeIsLoading] = useState(false);
-    const [theme, setTheme] = useStorage("theme", false, 'light');
+    // const [theme, setTheme] = useStorage("theme", false, 'light');
     const saveTheme = async (event) => {
         event.preventDefault();
         setThemeIsLoading(true);
         await saveToStorage("theme", theme);
         setTimeout(() => {
             setThemeIsLoading(false);
-            window.location.reload();
         }, 500);
     };
 
@@ -117,15 +110,7 @@ export default function Settings() {
                         <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
                             <div className="col-span-full">
                                 <div className="mt-2">
-                                    <RadioGroup
-                                        orientation="horizontal"
-                                        defaultValue={theme}
-                                        value={theme}
-                                        onChange={(e) => setTheme(e.target.value)}
-                                    >
-                                        <Radio value="light">Light</Radio>
-                                        <Radio value="dark">Dark</Radio>
-                                    </RadioGroup>
+                                    <ThemeSelector theme={theme} setTheme={setTheme} />
                                 </div>
                             </div>
                         </div>

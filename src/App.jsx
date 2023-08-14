@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import { Tabs, Tab } from "@nextui-org/react";
 import Settings from "./Settings.jsx";
 import Images from "./Images";
@@ -24,18 +24,25 @@ export default function App() {
         saveToStorage("active_tab", index)
     };
 
+    const [theme, setTheme] = useStorage("theme", false, 'light');
+    const [mainClass, setMainClass] = useState('light');
     const tabs = [
         { name: 'Chat', icon: <ChatBubbleLeftEllipsisIcon className="h-6 w-6" />, component: <Chat /> },
         { name: 'Images', icon: <PhotoIcon className="h-6 w-6"/>, component: <Images /> },
         { name: 'Embeddings', icon: <TableCellsIcon className="h-6 w-6"/>, component: <Embeddings /> },
         { name: 'Audio', icon: <SpeakerWaveIcon className="h-6 w-6"/>, component: <Audio /> },
-        { name: 'Settings', icon: <Cog6ToothIcon className="h-6 w-6"/>, component: <Settings /> }
+        { name: 'Settings', icon: <Cog6ToothIcon className="h-6 w-6"/>, component: <Settings  theme={theme} setTheme={setTheme} /> }
     ];
-
-    const [theme,] = useStorage("theme", false, 'light');
+    useEffect(() => {
+        if (theme.includes('dark')) {
+            setMainClass(`${theme} text-foreground bg-background`);
+        } else {
+            setMainClass(theme);
+        }
+    }, [theme]);
 
     return (
-        <main className={theme === 'light' ? 'light' : 'dark text-foreground bg-background min-h-screen'}>
+        <main className={mainClass}>
             <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
                 <div className="mx-auto w-full max-w-3xl lg:col-span-4 lg:mt-0 lg:max-w-none">
                     <Tabs
