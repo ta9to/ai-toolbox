@@ -3,6 +3,7 @@ import { Tabs, Tab } from "@nextui-org/react";
 import Settings from "./Settings.jsx";
 import Images from "./Images";
 import Audio from "./Audio";
+import AudioIndex from "./Audio/index.jsx";
 import Chat from "./Chat";
 import Embeddings from "./Embeddings";
 import { saveToStorage } from './storageUtils';
@@ -30,7 +31,7 @@ export default function App() {
         { name: 'Chat', icon: <ChatBubbleLeftEllipsisIcon className="h-6 w-6" />, component: <Chat /> },
         { name: 'Images', icon: <PhotoIcon className="h-6 w-6"/>, component: <Images /> },
         { name: 'Embeddings', icon: <TableCellsIcon className="h-6 w-6"/>, component: <Embeddings /> },
-        { name: 'Audio', icon: <SpeakerWaveIcon className="h-6 w-6"/>, component: <Audio /> },
+        { name: 'Audio', icon: <SpeakerWaveIcon className="h-6 w-6"/>, component: <AudioIndex /> },
         { name: 'Settings', icon: <Cog6ToothIcon className="h-6 w-6"/>, component: <Settings  theme={theme} setTheme={setTheme} /> }
     ];
     useEffect(() => {

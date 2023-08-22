@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import { Configuration, OpenAIApi } from 'openai';
-import { useStorage } from "./useStorage";
-import { saveToStorage } from './storageUtils';
-import { truncateString } from './utils';
+import { useStorage } from "../useStorage";
+import { saveToStorage } from '../storageUtils';
+import { truncateString } from '../utils';
 class CustomFormData extends FormData {
     getHeaders() {
         return {}
@@ -25,7 +25,7 @@ import {
     ClipboardIcon,
 } from '@heroicons/react/24/outline'
 
-export default function Audio() {
+export default function Transcription() {
     const [isLoading, setIsLoading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [enabled, setEnabled] = useStorage('audio_enabled')
