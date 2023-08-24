@@ -90,6 +90,8 @@ export default function Chat() {
             );
             // 入力メッセージをクリア
             setInputMessage("");
+        } else {
+            alert('Set the OpenAI API key from the Settings tab.');
         }
     };
 

@@ -23,19 +23,23 @@ export default function Images() {
         event.preventDefault();
         setIsLoading(true);
 
-        const configuration = new Configuration({
-            apiKey: apiKey,
-        });
-        const openai = new OpenAIApi(configuration);
-        const createImageRequest = {
-            prompt: prompt,
-            n: parseInt(n),
-            size: size,
-        };
-        const response = await openai.createImage(createImageRequest);
-        const imageUrls = response.data.data.map((imageData) => imageData.url);
-        saveToStorage('image_urls', imageUrls, true);
-        setImageUrls(imageUrls);
+        if (apiKey) {
+            const configuration = new Configuration({
+                apiKey: apiKey,
+            });
+            const openai = new OpenAIApi(configuration);
+            const createImageRequest = {
+                prompt: prompt,
+                n: parseInt(n),
+                size: size,
+            };
+            const response = await openai.createImage(createImageRequest);
+            const imageUrls = response.data.data.map((imageData) => imageData.url);
+            saveToStorage('image_urls', imageUrls, true);
+            setImageUrls(imageUrls);
+        } else {
+            alert('Set the OpenAI API key from the Settings tab.');
+        }
 
         setIsLoading(false);
     };
