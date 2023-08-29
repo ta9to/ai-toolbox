@@ -117,7 +117,7 @@ export default function Settings({ theme, setTheme }) {
 
                         <div className="mt-8 flex">
                             <Button type="submit" color="primary" isLoading={themeIsLoading}>
-                                {isLoading ? 'Saving...' : 'Save'}
+                                {themeIsLoading ? 'Saving...' : 'Save'}
                             </Button>
                         </div>
                     </form>
