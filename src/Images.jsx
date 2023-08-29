@@ -7,6 +7,7 @@ import {
     Button,
     Image,
     Skeleton,
+    Select, SelectItem
 } from "@nextui-org/react";
 import {
     ArrowDownOnSquareIcon,
@@ -17,7 +18,12 @@ export default function Images() {
     const [isLoading, setIsLoading] = useState(false);
     const [prompt, setPrompt] = useStorage("image_prompt", false, "A painting of a cat sitting on a chair.");
     const [n, setN] = useState(1);
-    const [size, setSize] = useState("256x256");
+    const [size, setSize] = useState(new Set(["256x256"]));
+    const sizes = [
+        "256x256",
+        "512x512",
+        "1024x1024",
+    ];
     const [imageUrls, setImageUrls] = useStorage("image_urls", true, []);
     const generateImage = async (event) => {
         event.preventDefault();
@@ -31,7 +37,7 @@ export default function Images() {
             const createImageRequest = {
                 prompt: prompt,
                 n: parseInt(n),
-                size: size,
+                size: Array.from(size).join(','),
             };
             const response = await openai.createImage(createImageRequest);
             const imageUrls = response.data.data.map((imageData) => imageData.url);
@@ -94,20 +100,17 @@ export default function Images() {
                         </div>
 
                         <div className="sm:col-span-3">
-                            <Input
-                                type="text"
+                            <Select
                                 label="size"
-                                placeholder="256x256"
+                                className="max-w-xs"
                                 description="The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024."
-                                list="size"
-                                value={size}
-                                onChange={(event) => setSize(event.target.value)}
-                            />
-                            <datalist id="size">
-                                <option value="256x256" />
-                                <option value="512x512" />
-                                <option value="1024x1024" />
-                            </datalist>
+                                defaultSelectedKeys={size}
+                                onSelectionChange={setSize}
+                            >
+                                {sizes.map((size) => (
+                                    <SelectItem key={size} value={size}>{size}</SelectItem>
+                                ))}
+                            </Select>
                         </div>
 
                     </div>
